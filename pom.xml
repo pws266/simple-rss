@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.dataart.rss</groupId>
+    <artifactId>simple-rss</artifactId>
+    <packaging>war</packaging>
+    <version>0.5</version>
+
+    <name>RSS Reader with Java Servlets usage</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+            <version>2.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>jstl</groupId>
+            <artifactId>jstl</artifactId>
+            <version>1.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.196</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>materializecss</artifactId>
+            <version>0.100.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <jdbc-driver-name>org.h2.Driver</jdbc-driver-name>
+
+        <db-name>db-rss</db-name>
+        <db-folder>~/data/</db-folder>
+        <db-url>jdbc:h2:${db-folder}${db-name};PASSWORD_HASH=TRUE</db-url>
+
+        <db-login>wagner</db-login>
+        <db-password>3aec1b886d7835f373823ad1ec5748060ed8336f0e25456df1de68ab02568c23</db-password>
+    </properties>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>${project.basedir}/src</sourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>${build.sourceDirectory}/main/resources</directory>
+            </resource>
+
+            <resource>
+                <directory>${build.sourceDirectory}/main/resources/sql</directory>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>write-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <!--    <outputFile>${project.build.sourceDirectory}/main/resources/db.properties</outputFile> -->
+                            <outputFile>${project.build.resources[0].directory}/db.properties</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>sql-maven-plugin</artifactId>
+                <version>1.5</version>
+
+                <dependencies>
+                    <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>1.4.196</version>
+                    </dependency>
+                </dependencies>
+
+                <configuration>
+                    <driver>${jdbc-driver-name}</driver>
+                    <url>${db-url}</url>
+
+                    <username>${db-login}</username>
+                    <password>${db-password}</password>
+                </configuration>
+
+
+                <executions>
+                    <execution>
+                        <id>create-db</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+
+                        <configuration>
+                            <autocommit>true</autocommit>
+                            <srcFiles>
+                                <!-- <srcFile>${project.basedir}/src/main/resources/CreateDB.sql</srcFile> -->
+                                <srcFile>${project.build.resources[0].directory}/sql/CreateDB.sql</srcFile>
+                            </srcFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <webappDirectory>${project.basedir}/web</webappDirectory>
+                    <failOnMissingWebXml>true</failOnMissingWebXml>
+                </configuration>
+            </plugin>
+
+<!-- Try to change to maven-ant-plugin for copy and explode *.war -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+
+                <executions>
+                    <execution>
+                        <id>copy-to-catalina-webapps</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${env.CATALINA_BASE}/webapps</outputDirectory>
+                                    <destFileName>${project.artifactId}.war</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+<!--
+                    <execution>
+                        <id>unpack-war</id>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>${project.artifactId}</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>war</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/${project.artifactId}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+-->
+                </executions>
+
+            </plugin>
+<!-- End of Try to change to maven-ant-plugin for copy and explode *.war -->
+
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+
+                <configuration>
+                    <url>http://localhost:8080</url>
+                    <server>localhost</server>
+                    <path>/${project.artifactId}</path>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+</project>

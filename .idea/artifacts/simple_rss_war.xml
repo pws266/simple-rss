@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="simple-rss:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="simple-rss.war">
+      <element id="artifact" artifact-name="simple-rss:war exploded" />
+    </root>
+  </artifact>
+</component>

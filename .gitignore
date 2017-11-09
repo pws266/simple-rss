@@ -1,0 +1,13 @@
+# Folders with compiled files
+out/
+target/
+
+# Folder of IntelliJ IDEA project
+#.idea/
+
+# Folder with database files
+data/
+
+# IntelliJ IDEA project file
+#simple-rss.iml
+
