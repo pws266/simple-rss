@@ -7,8 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
+ * Database service operations for user of RSS-reader
+ *
+ * @author Sergey "AIM" Sokhnyshev
  * Created by newbie on 07.11.17.
  */
+
 public class UserDAO {
     private static UserDAO userInstance;
     private DataProvider db;

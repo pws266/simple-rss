@@ -11,3 +11,5 @@ data/
 # IntelliJ IDEA project file
 #simple-rss.iml
 
+# Folders of built classes and libs
+web/WEB_INF/classes

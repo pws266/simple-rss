@@ -1,56 +1,18 @@
-package main.java.com.dataart.rss.web;
+package main.java.com.dataart.rss.webform;
 
 import static main.java.com.dataart.rss.data.Reference.EMPTY_CREDENTIAL_MSG;
 import static main.java.com.dataart.rss.data.Reference.PASSWORD_MISMATCH_MSG;
 
 /**
- * Created by newbie on 02.11.17.
+ * Created by newbie on 11.11.17.
  */
+public class SignUpFormData implements IFormData {
+    public LoginFormData loginForm;
 
-interface IFormData {
-    String checkForm();
-}
+    public String username;
+    public String confirmation;
 
-class LoginFormData implements IFormData{
-    String login;
-    String password;
-
-    private String errorOnEmptyLogin() {
-        if (login.isEmpty()) {
-            return "Login" + EMPTY_CREDENTIAL_MSG;
-        }
-
-        return "";
-    }
-
-    private String errorOnEmptyPassword() {
-        if (password.isEmpty()) {
-            return "Password" + EMPTY_CREDENTIAL_MSG;
-        }
-
-        return "";
-    }
-
-    @Override
-    public String checkForm() {
-        String errorMessage = errorOnEmptyLogin();
-
-        if (!errorMessage.isEmpty())
-            return errorMessage;
-
-        return errorOnEmptyPassword();
-
-
-    }
-}
-
-class SignUpFormData implements IFormData{
-    LoginFormData loginForm;
-
-    String username;
-    String confirmation;
-
-    SignUpFormData() {
+    public SignUpFormData() {
         loginForm = new LoginFormData();
     }
 

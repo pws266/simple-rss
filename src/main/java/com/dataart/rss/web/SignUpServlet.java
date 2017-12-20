@@ -5,6 +5,7 @@ package main.java.com.dataart.rss.web;
 
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.UserDAO;
+import main.java.com.dataart.rss.webform.SignUpFormData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -104,6 +105,6 @@ public class SignUpServlet extends HttpServlet {
         request.setAttribute("password", formData.loginForm.password);
         request.setAttribute("confirm", formData.confirmation);
 
-        sendMessageToForm(message, "red", "/sign-up.jsp", request, response);
+        sendMessageToForm(message, "indianred", "/sign-up.jsp", request, response);
     }
 }

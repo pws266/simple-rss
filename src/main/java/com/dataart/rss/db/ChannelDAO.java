@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import static main.java.com.dataart.rss.data.Reference.UNASSIGNED_ID;
 
@@ -31,47 +33,22 @@ public class ChannelDAO {
         return channelInstance;
     }
 
-    // searches for specified RSS-channel in database
-    public FeedChannel findChannel(String link) throws SQLException {
+    // searches for specified RSS-channel in CHANNEL table of database
+    public FeedChannel findChannel(String rssLink) throws SQLException {
         FeedChannel rssChannel = null;
 
-        String sqlQuery = "SELECT * FROM channel WHERE link = ?";
+        String sqlQuery = "SELECT * FROM channel WHERE rssLink = ?";
 
         db.connect();
         PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
 
-        statement.setString(1, link);
+        statement.setString(1, rssLink);
 
         ResultSet resultSet = statement.executeQuery();
 
         if (resultSet.next()) {
-            rssChannel = new FeedChannel(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getString("link"),
-                                         resultSet.getString("description"));}
-
-        resultSet.close();
-        statement.close();
-        db.disconnect();
-
-        return rssChannel;
-    }
-
-    // searches for specified RSS-channel saved for given user in database
-    public FeedChannel findChannel(String link, int userId) throws SQLException {
-        FeedChannel rssChannel = null;
-
-        String sqlQuery = "SELECT * FROM channel ch INNER JOIN user_channel uch ON ch.id = uch.fk_channel_id " +
-                          "WHERE ch.link = ? AND uch.fk_user_id = ?";
-
-        db.connect();
-        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
-
-        statement.setString(1, link);
-        statement.setString(2, link);
-
-        ResultSet resultSet = statement.executeQuery();
-
-        if (resultSet.next()) {
-            rssChannel = new FeedChannel(resultSet.getInt("id"), resultSet.getString("title"), resultSet.getString("link"),
+            rssChannel = new FeedChannel(resultSet.getInt("id"), resultSet.getString("rssLink"),
+                    resultSet.getString("title"), resultSet.getString("link"),
                     resultSet.getString("description"));}
 
         resultSet.close();
@@ -81,56 +58,111 @@ public class ChannelDAO {
         return rssChannel;
     }
 
-    // adds new RSS channel to database
-    public boolean addChannel(FeedChannel channel, int userId, boolean isSaved) throws SQLException {
-        String sqlQuery;
-        PreparedStatement statement;
+    // searches for specified RSS-channel saved for given user in USER_CHANNEL table of database
+    public FeedChannel findChannel(String rssLink, int userId) throws SQLException {
+        FeedChannel rssChannel = null;
+
+        String sqlQuery = "SELECT * FROM channel ch INNER JOIN user_channel uch ON ch.id = uch.fk_channel_id " +
+                          "WHERE ch.rssLink = ? AND uch.fk_user_id = ?";
+
+        db.connect();
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setString(1, rssLink);
+        statement.setInt(2, userId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            rssChannel = new FeedChannel(resultSet.getInt("id"), resultSet.getString("rssLink"),
+                                         resultSet.getString("title"), resultSet.getString("link"),
+                                         resultSet.getString("description"));}
+
+        resultSet.close();
+        statement.close();
+        db.disconnect();
+
+        return rssChannel;
+    }
+
+    // adds new RSS channel to CHANNEL table
+    // returns added channel ID
+    public int addChannel(FeedChannel channel) throws SQLException {
+        String sqlQuery = "INSERT INTO channel (rssLink, title, link, description) VALUES (?, ?, ?, ?)";
 
         db.connect();
 
-        // RSS-channel isn't saved in CHANNEL table
-        if (!isSaved) {
-            sqlQuery = "INSERT INTO channel (title, link, description) VALUES (?, ?, ?)";
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
 
-            statement = db.getConnection().prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
+        statement.setString(1, channel.getRssLink());
+        statement.setString(2, channel.getTitle());
+        statement.setString(3, channel.getLink());
+        statement.setString(4, channel.getDescription());
 
-            statement.setString(1, channel.getTitle());
-            statement.setString(2, channel.getLink());
-            statement.setString(3, channel.getDescription());
+        statement.executeUpdate();
 
-            statement.executeUpdate();
+        int channelId = UNASSIGNED_ID;
 
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                channel.setId(generatedKeys.getInt(1));
-            } else {
-                generatedKeys.close();
-                statement.close();
-                db.disconnect();
+        ResultSet generatedKeys = statement.getGeneratedKeys();
 
-                throw new SQLException("ChannelDAO->addChannel: unable to get ID of new inserted RSS-channel");
-            }
-
+        if (generatedKeys.next()) {
+            channelId = generatedKeys.getInt(1);
+        } else {
             generatedKeys.close();
             statement.close();
+            db.disconnect();
+
+            throw new SQLException("ChannelDAO->addChannel: unable to get ID of new inserted RSS-channel");
         }
 
-        // adding RSS-channel to "USER_CHANNEL" table
-        sqlQuery = "INSERT INTO user_channel (fk_user_id, fk_channel_id) VALUES (?, ?)";
+        generatedKeys.close();
+        statement.close();
 
-        statement = db.getConnection().prepareStatement(sqlQuery);
+        db.disconnect();
+
+        return channelId;
+    }
+
+    // assigns existing RSS channel to user with specified ID (copies given channel to USER_CHANNEL table)
+    public int assignChannelToUser(int channelId, int userId) throws SQLException {
+        String sqlQuery = "INSERT INTO user_channel (fk_user_id, fk_channel_id) VALUES (?, ?)";
+
+        db.connect();
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
 
         statement.setInt(1, userId);
-        statement.setInt(2, channel.getId());
+        statement.setInt(2, channelId);
 
-        boolean isChannelAdded = statement.executeUpdate() > 0;
+        statement.executeUpdate();
+
+        int userChannelId;
+
+        ResultSet generatedKeys = statement.getGeneratedKeys();
+
+        if (generatedKeys.next()) {
+            userChannelId = generatedKeys.getInt(1);
+        } else {
+            generatedKeys.close();
+            statement.close();
+            db.disconnect();
+
+            throw new SQLException("ChannelDAO->assignChannelToUser: unable to get ID of user and RSS-channel record");
+        }
+
+        generatedKeys.close();
+
+
+//        boolean isAssigned = statement.executeUpdate() > 0;
 
         statement.close();
         db.disconnect();
 
-        return isChannelAdded;
+//        return isAssigned;
+
+        return userChannelId;
     }
 
+    //TODO: rewrite method via ONE query to DB (see FeedItemDAO->copyItemsToUser)
     public boolean deleteChannel(int channelId, int userId) throws SQLException {
         // searching for given RSS-channel in "USER_CHANNEL" table
         String sqlQuery = "SELECT COUNT(*) FROM user_channel WHERE fk_user_id = ? AND fk_channel_id = ?";
@@ -176,5 +208,39 @@ public class ChannelDAO {
         db.disconnect();
 
         return isChannelDeleted;
+    }
+
+    // "getAllUserChannels" returns all channels belonged
+    public List<FeedChannel> getUserChannels(int userId) throws SQLException {
+        List<FeedChannel> userChannels = new ArrayList<>();
+
+        String sqlQuery = "SELECT * FROM channel ch INNER JOIN user_channel uch " +
+                           "ON uch.fk_channel_id = ch.id WHERE uch.fk_user_id = ?";
+
+        db.connect();
+
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+        statement.setInt(1, userId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            FeedChannel currentChannel = new FeedChannel();
+
+            currentChannel.setId(resultSet.getInt("id"));
+            currentChannel.setRssLink(resultSet.getString("rssLink"));
+            currentChannel.setTitle(resultSet.getString("title"));
+            currentChannel.setLink(resultSet.getString("link"));
+            currentChannel.setDescription(resultSet.getString("description"));
+
+            userChannels.add(currentChannel);
+        }
+
+        resultSet.close();
+        statement.close();
+
+        db.disconnect();
+
+        return userChannels;
     }
  }

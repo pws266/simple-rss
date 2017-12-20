@@ -17,20 +17,16 @@ import java.sql.SQLException;
  */
 @WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
-    private UserDAO userDAO;
-
-    @Override
-    public void init() {
-        userDAO = UserDAO.getInstance();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession();
+        HttpSession session = request.getSession(false);
 
-        String userLogin = (String)session.getAttribute("name");
+//        String userLogin = (String)session.getAttribute("name");
+        String userName = (String)session.getAttribute("userName");
+        String userLogin = (String)session.getAttribute("userLogin");
+
         session.invalidate();
-
+/*
         User user;
 
         try {
@@ -40,6 +36,8 @@ public class LogoutServlet extends HttpServlet {
         }
 
         String message = "User @" + user.getLogin() + " logged out successfully. Goodbye, " + user.getName();
+*/
+        String message = "User @" + userLogin + " logged out successfully. Goodbye, " + userName + ".";
         request.setAttribute("errorMessage", message);
         request.setAttribute("messageColor", "green");
 

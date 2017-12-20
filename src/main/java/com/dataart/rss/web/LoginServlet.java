@@ -1,7 +1,9 @@
 package main.java.com.dataart.rss.web;
 
+import main.java.com.dataart.rss.data.FeedChannel;
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.UserDAO;
+import main.java.com.dataart.rss.webform.LoginFormData;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Created by newbie on 01.11.17.
@@ -73,13 +76,14 @@ public class LoginServlet extends HttpServlet {
 
         if (isCorrect) {
             HttpSession currentSession = request.getSession();
-            currentSession.setAttribute("name", user.getLogin());
-            currentSession.setAttribute("login", user.getLogin());
+            currentSession.setAttribute("userName", user.getName());
+            currentSession.setAttribute("userLogin", user.getLogin());
 
             request.setAttribute("userName", user.getName());
             request.setAttribute("userLogin", user.getLogin());
 
-            request.getRequestDispatcher("/channel.jsp").forward(request, response);
+//            request.getRequestDispatcher("/channel.jsp").forward(request, response);
+            response.sendRedirect("show");
         } else {
             errorMessage = "Incorrect password for user @" + formData.login + ". Please check your credentials";
             sendErrorMessage(errorMessage, formData, request, response);
@@ -103,7 +107,7 @@ public class LoginServlet extends HttpServlet {
         request.setAttribute("password", formData.password);
 
         request.setAttribute("errorMessage", message);
-        request.setAttribute("messageColor", "red");
+        request.setAttribute("messageColor", "indianred");
 
         request.getRequestDispatcher("/login.jsp").forward(request, response);
     }

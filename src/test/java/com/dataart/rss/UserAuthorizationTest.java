@@ -8,7 +8,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.lang.reflect.Method;
 import java.security.NoSuchAlgorithmException;
 
-import main.java.com.dataart.rss.process.UserAuthorization;
+import main.java.com.dataart.rss.service.UserAuthorization;
 
 /**
  * Operations verification of user authorization module:

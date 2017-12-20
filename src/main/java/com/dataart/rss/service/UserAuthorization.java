@@ -1,4 +1,4 @@
-package main.java.com.dataart.rss.process;
+package main.java.com.dataart.rss.service;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
