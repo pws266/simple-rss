@@ -1,47 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f9fea212-a846-4ec9-a11d-188f54d32b7c" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/FeedItemDAO.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/service/FeedParser.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/ShowServlet.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/webform/ChannelFormData.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/webform/IFormData.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/webform/LoginFormData.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/FeedDAO.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/FeedDAOFactory.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/db/FeedDAO.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/db/FeedDAOFactory.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/process/UserAuthorization.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/IFormData.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/LoginFormData.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/SignUpFormData.class" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/web/WEB-INF/lib/materializecss-0.100.2.jar" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/process/UserAuthorization.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/service/UserAuthorization.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/FormData.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/webform/SignUpFormData.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/db/ChannelDAO.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/db/ChannelDAO.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/db/UserDAO.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/db/UserDAO.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/AddChannelServlet.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/AddChannelServlet.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/LoginServlet.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/LoginServlet.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/LogoutServlet.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/LogoutServlet.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/SignUpServlet.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/main/java/com/dataart/rss/web/SignUpServlet.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/test/java/com/dataart/rss/UserAuthorizationTest.class" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/test/java/com/dataart/rss/UserAuthorizationTest.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/ChannelDAO.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/ChannelDAO.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/UserDAO.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/db/UserDAO.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/AddChannelServlet.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/AddChannelServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/LoginServlet.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/LoginServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/LogoutServlet.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/LogoutServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/SignUpServlet.java" afterPath="$PROJECT_DIR$/src/main/java/com/dataart/rss/web/SignUpServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/db.properties" afterPath="$PROJECT_DIR$/src/main/resources/db.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/resources/sql/CreateDB.sql" afterPath="$PROJECT_DIR$/src/main/resources/sql/CreateDB.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/test/java/com/dataart/rss/UserAuthorizationTest.java" afterPath="$PROJECT_DIR$/src/test/java/com/dataart/rss/UserAuthorizationTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/CreateDB.sql" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/CreateDB.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/db.properties" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/db.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/WEB-INF/classes/sql/CreateDB.sql" afterPath="$PROJECT_DIR$/web/WEB-INF/classes/sql/CreateDB.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web/channel.jsp" afterPath="$PROJECT_DIR$/web/channel.jsp" />
-    </list>
+    <list default="true" id="f9fea212-a846-4ec9-a11d-188f54d32b7c" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -1020,12 +980,12 @@
       <workItem from="1513017097541" duration="4638000" />
       <workItem from="1513087475425" duration="8197000" />
       <workItem from="1513621680134" duration="6228000" />
-      <workItem from="1513777052064" duration="10957000" />
+      <workItem from="1513777052064" duration="11179000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="307676000" />
+    <option name="totallyTimeSpent" value="307898000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="66" y="52" width="1069" height="1028" extended-state="4" />
