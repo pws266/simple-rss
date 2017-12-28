@@ -3,6 +3,7 @@ package main.java.com.dataart.rss.web;
 import main.java.com.dataart.rss.data.FeedChannel;
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.ChannelDAO;
+import main.java.com.dataart.rss.db.FeedItemDAO;
 import main.java.com.dataart.rss.db.UserDAO;
 
 import javax.servlet.ServletException;
@@ -22,17 +23,20 @@ import java.util.List;
 public class ShowServlet extends HttpServlet {
     private UserDAO userDAO;
     private ChannelDAO channelDAO;
+    private FeedItemDAO itemDAO;
 
     @Override
     public void init() {
         userDAO = UserDAO.getInstance();
         channelDAO = ChannelDAO.getInstance();
+        itemDAO = FeedItemDAO.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             // TODO: make auxiliary class with error processing and user login verification
+/*
             HttpSession currentSession = request.getSession(false);
             String userLogin = (String) currentSession.getAttribute("userLogin");
 
@@ -43,11 +47,15 @@ public class ShowServlet extends HttpServlet {
             } catch (SQLException exc) {
                 throw new ServletException(exc);
             }
+*/
+            User currentUser = Helper.getUser(userDAO, request);
+            int initialChannelId = Helper.setChannelsToJsp(currentUser.getId(), channelDAO, request);
 
+            Helper.setItemsToJsp(currentUser.getId(), initialChannelId, 1, false, itemDAO, request);
 
-            List<FeedChannel> userChannels = channelDAO.getUserChannels(currentUser.getId());
-
-            request.setAttribute("listChannel", userChannels);
+//            List<FeedChannel> userChannels = channelDAO.getUserChannels(currentUser.getId());
+//
+//            request.setAttribute("listChannel", userChannels);
             request.getRequestDispatcher("/channel.jsp").forward(request, response);
         } catch (SQLException exc) {
             throw new ServletException(exc);

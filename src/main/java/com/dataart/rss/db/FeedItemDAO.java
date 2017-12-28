@@ -5,10 +5,11 @@ import main.java.com.dataart.rss.data.FeedItem;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
-import static main.java.com.dataart.rss.data.Reference.UNASSIGNED_ID;
+import static main.java.com.dataart.rss.data.Reference.FEEDS_PER_PAGE;
 
 /**
  * Database service operations for single RSS-item
@@ -118,5 +119,51 @@ public class FeedItemDAO {
         db.disconnect();
 
         return isOk;
+    }
+
+    // "getChannelFeeds" returns list of RSS-feeds of user and RSS-channel with specified IDs
+    public List<FeedItem> getChannelFeedsForUser(int userId, int channelId, int pageNumber, boolean isDesc) throws SQLException {
+        List<FeedItem> feeds = new ArrayList<>();
+
+        String sqlQueryPattern = "SELECT * FROM item it INNER JOIN user_item uit ON it.guid = uit.fk_item_guid " +
+                                 "INNER JOIN user_channel uch ON uit.fk_user_channel_id = uch.id " +
+                                 "WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ? ORDER BY it.pubDate ";
+        sqlQueryPattern += isDesc ? "DESC " : "ASC ";
+        sqlQueryPattern += "LIMIT %d, %d";
+
+        int offset = (pageNumber - 1)*FEEDS_PER_PAGE + 1;
+        String sqlQuery = String.format(sqlQueryPattern, offset, FEEDS_PER_PAGE);
+
+        db.connect();
+
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+        statement.setInt(1, userId);
+        statement.setInt(2, channelId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        while (resultSet.next()) {
+            FeedItem currentItem = new FeedItem();
+
+            // TODO: custom structure for search results
+            currentItem.setGuid(resultSet.getString("guid"));
+            currentItem.setTitle(resultSet.getString("title"));
+            currentItem.setLink(resultSet.getString("link"));
+
+
+            // TODO: make correct "text" field reading via ajax
+            // currentItem.setDescription(resultSet.getBlob("description"));
+
+            currentItem.setPubDate(resultSet.getTimestamp("pubDate"));
+
+            feeds.add(currentItem);
+        }
+
+        resultSet.close();
+        statement.close();
+
+        db.disconnect();
+
+        return feeds;
     }
 }

@@ -165,14 +165,16 @@ public class ChannelDAO {
     //TODO: rewrite method via ONE query to DB (see FeedItemDAO->copyItemsToUser)
     public boolean deleteChannel(int channelId, int userId) throws SQLException {
         // searching for given RSS-channel in "USER_CHANNEL" table
-        String sqlQuery = "SELECT COUNT(*) FROM user_channel WHERE fk_user_id = ? AND fk_channel_id = ?";
+        String sqlQuery = "SELECT COUNT(*) FROM user_channel WHERE fk_channel_id = ?";
+        // String sqlQuery = "SELECT COUNT(*) FROM user_channel WHERE fk_user_id = ? AND fk_channel_id = ?";
 
         db.connect();
 
         PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
 
-        statement.setInt(1, userId);
-        statement.setInt(2, channelId);
+//        statement.setInt(1, userId);
+//        statement.setInt(2, channelId);
+        statement.setInt(1, channelId);
 
         int channelUsersNumber = UNASSIGNED_ID;
         ResultSet resultSet = statement.executeQuery();
@@ -193,7 +195,7 @@ public class ChannelDAO {
         // deleting reference on channel from USER_CHANNEL table or channel from CHANNEL table
         sqlQuery = "DELETE FROM ";
         sqlQuery += (channelUsersNumber == 1) ? "channel WHERE id = ?" :
-                                                "user_channel WHERE fk_user_id = ? AND fk_user_id = ?";
+                                                "user_channel WHERE fk_channel_id = ? AND fk_user_id = ?";
 
         statement = db.getConnection().prepareStatement(sqlQuery);
 
@@ -210,7 +212,7 @@ public class ChannelDAO {
         return isChannelDeleted;
     }
 
-    // "getAllUserChannels" returns all channels belonged
+    // "getAllUserChannels" returns all channels that are belonged to specified user
     public List<FeedChannel> getUserChannels(int userId) throws SQLException {
         List<FeedChannel> userChannels = new ArrayList<>();
 
