@@ -2,13 +2,47 @@
  * Channel's page layouts
  */
 
+#top-block {
+    background-color: #d2d2d2;
+    overflow: hidden;
+}
+
+#top-block > div {
+    min-height: 60px;
+}
+
 #header {
-    min-height: 40px;
     background-color: #f1f1f1;
+    overflow: hidden;
+}
+
+#header > div {
+    min-height: 150px;
+}
+
+#channel-operation {
+    background-color: #c2d9c3;
+
+    float: left;
+    width: 34%;
+}
+
+#feed-operation {
+    background-color: #d5ced9;
+
+    float: left;
+    width: 33%;
+}
+
+#search {
+    background-color: #d9cabc;
+
+    float: left;
+    width: 33%;
 }
 
 #main-wrap {
-    background-color: #D9D9D9;
+    background-color: #d2d2d2;
 
     overflow: hidden;
 }
@@ -21,14 +55,16 @@
     background-color: #d2d2d2;
 
     float: left;
-    width: 30%;
+    /* width: 30%; */
+    width: 34%;
 }
 
 #content-wrap {
     background-color: #c5c5c5;
 
     float: right;
-    width: 70%;
+    /* width: 70%; */
+    width: 66%;
 
     position: relative;
 }
@@ -60,14 +96,100 @@
     background-color: #c5c5c5;
 
     float: left;
-    width: 40%;
+    /* width: 40%; */
+    width: 34%;
 }
 
 #feed-desc {
     background-color: #d2d2d2;
 
     float: left;
-    width: 60%;
+    /* width: 60%; */
+    width: 66%;
+}
+#topInfo {
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    width: 98%;
+
+    border: 1px solid darkgray;
+    border-collapse: collapse;
+}
+
+#topInfo td {
+    border: 0;
+}
+
+/* Table for operations on RSS-feeds */
+.controlTable {
+    margin-top: 5px;
+    width: 97%;
+
+    border: 1px solid darkgray;
+    border-collapse: collapse;
+}
+
+.controlTable td, .ct-caption-th, .ct-group-th, .ct-left-td, .ct-right-td {
+    padding: 3px;
+}
+
+.ct-caption-th {
+    color: white;
+    background-color: cornflowerblue;
+    font-weight: bold;
+
+    border: 1px solid darkgray;
+}
+
+.controlTable td, .ct-group-th, .ct-left-td, .ct-right-td {
+    border: 0;
+}
+
+.ct-group-th {
+    font-weight: bold;
+}
+
+.ct-left-td {
+    width: 30%;
+    font-weight: bold;
+}
+
+.ct-right-td {
+    width: 70%;
+}
+
+/* Table for operations on RSS-channels */
+#rssOperation {
+    margin-top: 5px;
+    width: 97%;
+
+    border: 1px solid darkgray;
+    border-collapse: collapse;
+}
+
+#rssOperation td, #caption-th, .oper-left-td, .oper-right-td {
+    padding: 3px;
+}
+
+#caption-th {
+    color: white;
+    background-color: cornflowerblue;
+    font-weight: bold;
+
+    border: 1px solid darkgray;
+}
+#rssOperation td, .oper-left-td, .oper-right-td {
+    border: 0;
+}
+
+.oper-left-td {
+    width: 30%;
+    font-weight: bold;
+}
+
+.oper-right-td {
+    width: 70%;
 }
 
 /* Table for selected channel description */
@@ -93,31 +215,6 @@
 }
 
 #channelInfo td {
-    border: 0;
-}
-
-/* Table for operations on RSS-channels */
-#rssOperation {
-    width: 460px;
-
-    border: 1px solid darkgray;
-    border-collapse: collapse;
-}
-
-#rssOperation th {
-    color: white;
-    background-color: cornflowerblue;
-
-    border: 1px solid darkgray;
-}
-
-/*
-#rssOperation th, td {
-    padding: 3px;
-}
-*/
-
-#rssOperation td {
     border: 0;
 }
 
@@ -191,4 +288,8 @@
 #rssFeed tr.selected {
     background-color: brown;
     color: #FFF;
+}
+
+form {
+    display: none;
 }

@@ -1,6 +1,5 @@
 package main.java.com.dataart.rss.web;
 
-import main.java.com.dataart.rss.data.FeedChannel;
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.ChannelDAO;
 import main.java.com.dataart.rss.db.FeedItemDAO;
@@ -11,10 +10,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Created by newbie on 12.12.17.
@@ -23,13 +20,13 @@ import java.util.List;
 public class ShowServlet extends HttpServlet {
     private UserDAO userDAO;
     private ChannelDAO channelDAO;
-    private FeedItemDAO itemDAO;
+    private FeedItemDAO feedDAO;
 
     @Override
     public void init() {
         userDAO = UserDAO.getInstance();
         channelDAO = ChannelDAO.getInstance();
-        itemDAO = FeedItemDAO.getInstance();
+        feedDAO = FeedItemDAO.getInstance();
     }
 
     @Override
@@ -48,10 +45,12 @@ public class ShowServlet extends HttpServlet {
                 throw new ServletException(exc);
             }
 */
+            boolean isDescSorting = "desc".equals(request.getSession().getAttribute("sortingState"));
+
             User currentUser = Helper.getUser(userDAO, request);
             int initialChannelId = Helper.setChannelsToJsp(currentUser.getId(), channelDAO, request);
 
-            Helper.setItemsToJsp(currentUser.getId(), initialChannelId, 1, false, itemDAO, request);
+            Helper.setItemsToJsp(currentUser.getId(), initialChannelId, 1, 1, isDescSorting /*false*/, feedDAO, request);
 
 //            List<FeedChannel> userChannels = channelDAO.getUserChannels(currentUser.getId());
 //

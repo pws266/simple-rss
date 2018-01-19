@@ -231,7 +231,12 @@ public class ChannelDAO {
 
             currentChannel.setId(resultSet.getInt("id"));
             currentChannel.setRssLink(resultSet.getString("rssLink"));
+
             currentChannel.setTitle(resultSet.getString("title"));
+            if (currentChannel.getTitle().isEmpty()) {
+                currentChannel.setTitle(currentChannel.getRssLink());
+            }
+
             currentChannel.setLink(resultSet.getString("link"));
             currentChannel.setDescription(resultSet.getString("description"));
 

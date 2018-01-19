@@ -29,6 +29,10 @@ public class RemoveChannelServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int channelId = Integer.parseInt(request.getParameter("deletedChannelId"));
+        String mySort = request.getParameter("sorting");
+
+        Helper.setSortingToSession("sortRBForDelete", request);
+
         try {
             User currentUser = Helper.getUser(userDAO, request);
 

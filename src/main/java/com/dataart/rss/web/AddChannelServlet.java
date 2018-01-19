@@ -1,6 +1,5 @@
 package main.java.com.dataart.rss.web;
 
-import com.sun.istack.internal.Nullable;
 import main.java.com.dataart.rss.data.FeedChannel;
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.ChannelDAO;
@@ -19,7 +18,6 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.List;
 
 import static main.java.com.dataart.rss.data.Reference.UNASSIGNED_ID;
 
@@ -147,8 +145,9 @@ public class AddChannelServlet extends HttpServlet {
             }
         }
 
-
         // сливаем каналы пользователя в список и отдаем в channel.jsp, там разбираем
+        Helper.setSortingToSession("sortRBForAdd", request);
+
         response.sendRedirect("show");
 //        try {
 //            List<FeedChannel> userChannels = channelDAO.getUserChannels(currentUser.getId());

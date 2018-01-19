@@ -83,6 +83,8 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("userLogin", user.getLogin());
 
 //            request.getRequestDispatcher("/channel.jsp").forward(request, response);
+            Helper.setSortingToSession("", request);
+
             response.sendRedirect("show");
         } else {
             errorMessage = "Incorrect password for user @" + formData.login + ". Please check your credentials";

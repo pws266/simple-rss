@@ -121,6 +121,33 @@ public class FeedItemDAO {
         return isOk;
     }
 
+    // "getFeedsNumberForUser" returns number of RSS-feeds for specified user and channel
+    public int getFeedsNumberForUser(int userId, int channelId) throws SQLException {
+        String sqlQuery = "SELECT COUNT(*) FROM user_item uit INNER JOIN user_channel uch " +
+                          "ON uit.fk_user_channel_id = uch.id WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ?";
+
+        db.connect();
+
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setInt(1, userId);
+        statement.setInt(2, channelId);
+
+        int feedsNumber = 0;
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            feedsNumber = resultSet.getInt(1);
+        }
+
+        resultSet.close();
+
+        statement.close();
+        db.disconnect();
+
+        return feedsNumber;
+    }
+
     // "getChannelFeeds" returns list of RSS-feeds of user and RSS-channel with specified IDs
     public List<FeedItem> getChannelFeedsForUser(int userId, int channelId, int pageNumber, boolean isDesc) throws SQLException {
         List<FeedItem> feeds = new ArrayList<>();
@@ -131,7 +158,8 @@ public class FeedItemDAO {
         sqlQueryPattern += isDesc ? "DESC " : "ASC ";
         sqlQueryPattern += "LIMIT %d, %d";
 
-        int offset = (pageNumber - 1)*FEEDS_PER_PAGE + 1;
+        // int offset = (pageNumber - 1)*FEEDS_PER_PAGE + 1;
+        int offset = (pageNumber - 1)*FEEDS_PER_PAGE;
         String sqlQuery = String.format(sqlQueryPattern, offset, FEEDS_PER_PAGE);
 
         db.connect();

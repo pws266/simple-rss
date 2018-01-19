@@ -13,6 +13,14 @@
 
     <script type="text/javascript" src="resources/js/jquery-1.8.3.js"></script>
     <script type="text/javascript" src="resources/js/jquery.simplePagination.js"></script>
+
+    <script type="text/javascript">
+        var feedsNumber = <%=request.getAttribute("feedsNumber")%>,
+            feedsPerPage = <%=request.getAttribute("feedsPerPage")%>,
+            currentPage = <%=request.getAttribute("currentPageNumber")%>,
+            currentChannelRow=<%=request.getAttribute("currentChannelRow")%>;
+    </script>
+
     <script type="text/javascript" src="resources/js/select-channel.js"></script>
 
 
@@ -20,70 +28,123 @@
 <body>
     <h1>Channels list</h1>
 
-    <div id="header">
-        <%--@elvariable id="userName" type="java.lang.String"--%>
-        <%--@elvariable id="userLogin" type="java.lang.String"--%>
-        <c:choose>
-            <c:when test="${empty userLogin}">
-                <p style="color:indianred; font-weight:bold">There is no logged in users</p>
-            </c:when>
-
-            <c:when test="${not empty userName && not empty userLogin}">
-                <form action="logout" method="GET">
-                    <p style="color:royalblue; font-weight:bold">Current user:
-                        <jsp:text>${userName} @${userLogin}</jsp:text>
-                        <input type="submit" value="Logout" />
-                    </p>
-                </form>
-            </c:when>
-        </c:choose>
-
-        <form action="add-channel" method="POST" id="addChannelForm"></form>
-        <form action="show-feeds" method="POST" id="showFeedsForm">
-            <input type="hidden" id="ShowChannel" name="displayChannelId" value="">
-        </form>
-        <form action="delete-channel" method="POST" id="deleteChannelForm">
-            <input type="hidden" id="DelChannel" name="deletedChannelId" value="">
-        </form>
-
-        <!--table frame="box"-->
-        <table id="rssOperation">
+    <div id="top-block">
+        <table id="topInfo" align="center">
+            <form action="logout" method="GET" id="logoutForm"></form>
             <tr>
-                <!--td colspan="3" align="center" style="color:white; background-color: cornflowerblue"-->
-                <th colspan="3" align="center">
-                    <b>RSS channel operations</b>
-                </th>
-            </tr>
+                <%--@elvariable id="userName" type="java.lang.String"--%>
+                <%--@elvariable id="userLogin" type="java.lang.String"--%>
+                <c:choose>
+                    <c:when test="${empty userLogin}">
+                        <td align="left" style="width: 45%; color:indianred; font-weight:bold">
+                            There is no logged in users
+                        </td>
+                    </c:when>
 
-            <tr>
-                <td><b>New channel link</b></td>
-                <td>
-                    <input style="width: 250px" title="Channel link" type="text" name="rssLink"
-                           value='${requestScope["rssLink"]}' form="addChannelForm" />
+                    <c:when test="${not empty userName && not empty userLogin}">
+                        <td align="left" style="width: 45%; color:royalblue; font-weight:bold">
+                            Current user: <jsp:text>${userName} @${userLogin}</jsp:text>
+                            <input type="submit" value="Logout" form="logoutForm" />
+                        </td>
+                    </c:when>
+                </c:choose>
+
+                <td align="left" style="width: 55%; color:${messageColor}; font-weight: bold">
+                    <%--@elvariable id="errorMessage" type="java.lang.String"--%>
+                    <%--@elvariable id="messageColor" type="java.lang.String"--%>
+                    <c:choose>
+                        <c:when test="${not empty errorMessage}">
+                            <jsp:text>${errorMessage}</jsp:text>
+                        </c:when>
+                    </c:choose>
                 </td>
-
-                <td><input type="submit" style="width: 60px" value="Add" form="addChannelForm" /></td>
-            </tr>
-
-            <tr>
-                <td><b>Selected channel</b></td>
-                <td align="right"><input type="submit" style="width: 60px" value="Show" form="showFeedsForm" /></td>
-                <td><input type="submit" style="width: 60px" value="Remove" form="deleteChannelForm" /></td>
-
             </tr>
         </table>
+    </div>
 
-        <%--@elvariable id="errorMessage" type="java.lang.String"--%>
-        <%--@elvariable id="messageColor" type="java.lang.String"--%>
-        <c:choose>
-            <c:when test="${not empty errorMessage}">
-                <p style="color:${messageColor}; font-weight:bold"><jsp:text>
-                    ${errorMessage}</jsp:text></p>
-            </c:when>
-            <c:otherwise>
-                <br>
-            </c:otherwise>
-        </c:choose>
+    <div id="header">
+        <div id="channel-operation">
+            <form action="add-channel" method="POST" id="addChannelForm">
+                <input type="hidden" id="SortRBForAdd" name="sortRBForAdd" value='${requestScope["sortRBForAdd"]}'>
+            </form>
+            <form action="show-feeds" method="POST" id="showFeedsForm">
+                <input type="hidden" id="ShowChannel" name="displayChannelId" value="">
+                <input type="hidden" id="ChannelRow" name="channelRow" value="">
+                <input type="hidden" id="PageForShow" name="pageNumber" value='${requestScope["pageNumber"]}'>
+            </form>
+            <form action="delete-channel" method="POST" id="deleteChannelForm">
+                <input type="hidden" id="DelChannel" name="deletedChannelId" value="">
+                <input type="hidden" id="SortRBForDelete" name="sortRBForDelete" value='${requestScope["sortRBForDelete"]}'>
+            </form>
+
+            <table id="rssOperation" align="center">
+                <tr>
+                    <!--td colspan="3" align="center" style="color:white; background-color: cornflowerblue"-->
+                    <th id="caption-th" colspan="2" align="center">
+                        Channels control
+                    </th>
+                </tr>
+
+                <tr>
+                    <td class="oper-left-td">RSS link:</td>
+                    <td class="oper-right-td">
+                        <input style="width: 97%" title="Channel link" type="text" name="rssLink"
+                               value='${requestScope["rssLink"]}' form="addChannelForm" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="oper-left-td">Action:</td>
+                    <td class="oper-right-td">
+                        <input type="submit" style="width: 60px; padding: 0" value="Add" form="addChannelForm" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Show" form="showFeedsForm" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Remove" form="deleteChannelForm" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="feed-operation">
+            <!-- Feeds control table-->
+            <table class="controlTable" align="center">
+                <tr>
+                    <th class="ct-caption-th" colspan="2" align="center">
+                        Feeds control
+                    </th>
+                </tr>
+
+                <tr>
+                    <th class="ct-group-th" colspan="2" align="left">Sorting</th>
+                </tr>
+                <tr>
+                    <td class="ct-left-td" align="right">
+                        <input name="sorting" type="radio" value="asc" ${requestScope["sorting"]=='asc'?'checked':''} form="showFeedsForm">
+                    </td>
+                    <td class="ct-right-td">
+                        Ascending
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="ct-left-td" align="right">
+                        <input name="sorting" type="radio" value="desc" ${requestScope["sorting"]=='desc'?'checked':''} form="showFeedsForm">
+                    </td>
+                    <td class="ct-right-td">
+                        Descending
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="ct-left-td">Action:</td>
+                    <td class="ct-right-td">
+                        <!-- Создавать свои формы под реакции -->
+                        <input type="submit" style="width: 60px; padding: 0" value="As Read" form="addChannelForm" />
+                        <input type="submit" style="width: 70px; padding: 0" value="As Unread" form="showFeedsForm" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Delete" form="deleteChannelForm" />
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     <div id="main-wrap">
