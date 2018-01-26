@@ -192,6 +192,32 @@
     width: 70%;
 }
 
+/* Class for selected channel/feed description */
+.infoTable {
+    margin-top: 5px;
+    width: 97%;
+    background-color: #c5c5c5;
+
+    border: 1px solid lightgoldenrodyellow;
+    border-collapse: collapse;
+}
+
+.infoTable th, td {
+    padding: 3px;
+    cursor: pointer;
+}
+
+.infoTable th {
+    color: white;
+    background-color: cornflowerblue;
+
+    border: 1px solid lightgoldenrodyellow;
+}
+
+.infoTable td {
+    border: 0;
+}
+
 /* Table for selected channel description */
 #channelInfo {
     margin-top: 5px;
@@ -257,6 +283,13 @@
     background-color: #c5c5c5;
 
     border-collapse: collapse;
+}
+
+#rssFeed td:nth-child(3), #rssList th:nth-child(3),
+#rssFeed td:nth-child(4), #rssList th:nth-child(4),
+#rssFeed td:nth-child(5), #rssList th:nth-child(5)
+{
+    display: none;
 }
 
 #rssFeed td, #top-th, #left-th, #right-th {

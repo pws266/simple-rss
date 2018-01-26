@@ -1,7 +1,5 @@
 package main.java.com.dataart.rss.web;
 
-import main.java.com.dataart.rss.data.FeedItem;
-// import main.java.com.dataart.rss.data.Reference;
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.ChannelDAO;
 import main.java.com.dataart.rss.db.FeedItemDAO;
@@ -14,9 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
-
-import static main.java.com.dataart.rss.data.Reference.FEEDS_PER_PAGE;
 
 /**
  * Created by newbie on 26.12.17.

@@ -71,6 +71,7 @@
                 <input type="hidden" id="ShowChannel" name="displayChannelId" value="">
                 <input type="hidden" id="ChannelRow" name="channelRow" value="">
                 <input type="hidden" id="PageForShow" name="pageNumber" value='${requestScope["pageNumber"]}'>
+                <input type="hidden" id="FeedRow" name="feedRow" value="">
             </form>
             <form action="delete-channel" method="POST" id="deleteChannelForm">
                 <input type="hidden" id="DelChannel" name="deletedChannelId" value="">
@@ -97,7 +98,7 @@
                     <td class="oper-left-td">Action:</td>
                     <td class="oper-right-td">
                         <input type="submit" style="width: 60px; padding: 0" value="Add" form="addChannelForm" />
-                        <input type="submit" style="width: 60px; padding: 0" value="Show" form="showFeedsForm" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Update" form="showFeedsForm" />
                         <input type="submit" style="width: 60px; padding: 0" value="Remove" form="deleteChannelForm" />
                     </td>
                 </tr>
@@ -138,9 +139,9 @@
                     <td class="ct-left-td">Action:</td>
                     <td class="ct-right-td">
                         <!-- Создавать свои формы под реакции -->
-                        <input type="submit" style="width: 60px; padding: 0" value="As Read" form="addChannelForm" />
-                        <input type="submit" style="width: 70px; padding: 0" value="As Unread" form="showFeedsForm" />
-                        <input type="submit" style="width: 60px; padding: 0" value="Delete" form="deleteChannelForm" />
+                        <input type="button" style="width: 60px; padding: 0" value="As Read" form="showFeedsForm" onclick="markFeedRead(event)" />
+                        <input type="button" style="width: 70px; padding: 0" value="As Unread" form="showFeedsForm" onclick="markFeedUnread(event)" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Delete" form="showFeedsForm" />
                     </td>
                 </tr>
             </table>
@@ -184,9 +185,32 @@
                 </tr>
 
                 <c:forEach var="curFeed" items="${listFeed}">
-                    <tr>
+                    <c:choose>
+                        <c:when test="${not curFeed.readFlag}">
+                            <tr style="font-weight: bold">
+                        </c:when>
+                        <c:otherwise>
+                            <tr style="font-weight: normal">
+                        </c:otherwise>
+                    </c:choose>
+
+                    <%--<tr>--%>
+                        <%--<c:choose>--%>
+                            <%--<c:when test="${not curFeed.readFlag}">--%>
+                                <%--<td><b><c:out value="${curFeed.pubDate}" /></b></td>--%>
+                                <%--<td><b><c:out value="${curFeed.title}" /></b></td>--%>
+                            <%--</c:when>--%>
+                            <%--<c:otherwise>--%>
+                                <%--<td><c:out value="${curFeed.pubDate}" /></td>--%>
+                                <%--<td><c:out value="${curFeed.title}" /></td>--%>
+                            <%--</c:otherwise>--%>
+                        <%--</c:choose>--%>
                         <td><c:out value="${curFeed.pubDate}" /></td>
                         <td><c:out value="${curFeed.title}" /></td>
+
+                        <td><c:out value="${curFeed.link}" /></td>
+                        <td><c:out value="${curFeed.description}" /></td>
+                        <td><c:out value="${curFeed.guid}" /></td>
                     </tr>
                 </c:forEach>
             </table>
@@ -226,7 +250,23 @@
         </div>
 
         <div id="feed-desc">
-            Display here feed info!
+            <table class="infoTable" align="center">
+                <tr>
+                    <th colspan="1">
+                        <b>Selected feed info</b>
+                    </th>
+                </tr>
+                <tr id="feed-link-row">
+                    <td>
+                        <b>Link: </b>
+                    </td>
+                </tr>
+                <tr id="feed-description-row">
+                    <td>
+                        <b>Description: </b>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </body>

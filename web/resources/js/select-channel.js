@@ -2,6 +2,50 @@
  * Created by newbie on 21.12.17.
  */
 
+// mark feeds read/unread
+function markFeed(event, state, rowIndex, channelId) {
+    event.preventDefault();
+
+    var $trRssFeed = $("#rssFeed").find("tr"),
+        myRow = $($trRssFeed.parents("table")[0]).find("tr")[rowIndex],
+        $feedGuid=$(myRow).find('td:nth-child(5)').html();
+
+    $.ajax({
+        url: "../mark-feed",
+        type: "POST",
+        dataType: "json",
+        cache: false,
+        data: {
+            channelId: channelId,
+            feedGuid: $feedGuid,
+            feedRow: rowIndex,
+            feedState: state
+        },
+
+        error: function(message) {
+            console.log(message);
+        },
+
+        success: function(data) {
+            if (state == true) {
+                $(myRow).css("font-weight", "normal");
+            } else {
+                $(myRow).css("font-weight", "bold");
+            }
+
+            console.log(data);
+        }
+    });
+}
+
+function markFeedRead(event) {
+    markFeed(event, true, $("#FeedRow").val(), $("#ShowChannel").val());
+}
+
+function markFeedUnread(event) {
+    markFeed(event, false, $("#FeedRow").val(), $("#ShowChannel").val());
+}
+
 $(window).load(function(){
     var $trRssList = $("#rssList").find("tr"),
         $trRssFeed = $("#rssFeed").find("tr");
@@ -80,7 +124,7 @@ $(window).load(function(){
         $("#ShowChannel").val($channelId);
 
         $("#ChannelRow").val(rowIndex);
-    };
+    }
 
     $trRssList.click(function(){
         var rowIndex = $(this).index();
@@ -96,27 +140,105 @@ $(window).load(function(){
         $("#showFeedsForm").submit();
     });
 
-    $("#rssFeed tr").click(function(){
-        $(this).addClass('selected').siblings().removeClass('selected');
+    function showFeed(elm, rowIndex) {
+        var myRow = $($(elm).parents("table")[0]).find("tr")[rowIndex];
 
-        // var $linkContent=$(this).find('td:nth-child(2)').html();//$("#rssList tr td:nth-child(2)").html();
-        // var $descContent=$(this).find('td:nth-child(3)').html();
-        // var $channelId=$(this).find('td:nth-child(4)').html();
-        //
-        // var $link = $("<a>").text($linkContent).attr("href", $linkContent);
-        // $($("#channel-link-row td")[0]).html("").append('<b>Link:</b> ').append($link);
-        //
-        // $($("#channel-description-row td")[0]).html("").append('<b>Description:</b> ').append($descContent);
+        $(myRow).addClass('selected').siblings().removeClass('selected');
+        $(elm).parent("table").find("tr.selected").find("td:first").html();
 
-        $("#rssFeed tr.selected td:first").html();
-        // $("#DelChannel").val($channelId);
-        // $("#ShowChannel").val($channelId);
-        // alert("Feed number: " + this.rowIndex);
+        var $linkContent=$(myRow).find('td:nth-child(3)').html(),
+            $descContent=$(myRow).find('td:nth-child(4)').html(),
+            $feedGuid=$(myRow).find('td:nth-child(5)').html(),
+            $feedRow = rowIndex;
+
+        var $link = $("<a>").text($linkContent).attr("href", $linkContent);
+        $($("#feed-link-row").find("td")[0]).html("").append('<b>Link:</b> ').append($link);
+
+        $($("#feed-description-row").find("td")[0]).html("").append('<b>Description:</b> ').append($descContent);
+
+        $("#FeedRow").val(rowIndex);
+
+        // $.ajax({
+        //     url: "../mark-feed",
+        //     type: "POST",
+        //     dataType: "json",
+        //     cache: false,
+        //     data: {
+        //             channelId: $("#ShowChannel").val(),
+        //             feedGuid: $feedGuid,
+        //             feedRow: $feedRow.val()
+        //     },
+        //
+        //     error: function(message) {
+        //         console.log(message);
+        //     },
+        //
+        //     success: function(data) {
+        //         alert("хуй!");
+        //         console.log(data);
+        //     }
+        // });
+    }
+
+    $trRssFeed.click(function(){
+        var rowIndex = $(this).index();
+        if (rowIndex < 2) {
+            return;
+        }
+
+        showFeed(this, rowIndex);
+
+        // >> Working code!!
+        // var myRow = $($(this).parents("table")[0]).find("tr")[rowIndex],
+        //     $feedGuid=$(myRow).find('td:nth-child(5)').html();
+        //
+        // $.ajax({
+        //     url: "../mark-feed",
+        //     type: "POST",
+        //     dataType: "json",
+        //     cache: false,
+        //     data: {
+        //             channelId: $("#ShowChannel").val(),
+        //             feedGuid: $feedGuid,
+        //             feedRow: rowIndex
+        //     },
+        //
+        //     error: function(message) {
+        //         console.log(message);
+        //     },
+        //
+        //     success: function(data) {
+        //         alert("хуй!");
+        //         $(myRow).css("font-weight", "normal");
+        //
+        //         console.log(data);
+        //     }
+        //});
     });
 
 
+
+    // $("#rssFeed tr").click(function(){
+    //     $(this).addClass('selected').siblings().removeClass('selected');
+    //
+    //     // var $linkContent=$(this).find('td:nth-child(2)').html();//$("#rssList tr td:nth-child(2)").html();
+    //     // var $descContent=$(this).find('td:nth-child(3)').html();
+    //     // var $channelId=$(this).find('td:nth-child(4)').html();
+    //     //
+    //     // var $link = $("<a>").text($linkContent).attr("href", $linkContent);
+    //     // $($("#channel-link-row td")[0]).html("").append('<b>Link:</b> ').append($link);
+    //     //
+    //     // $($("#channel-description-row td")[0]).html("").append('<b>Description:</b> ').append($descContent);
+    //
+    //     $("#rssFeed tr.selected td:first").html();
+    //     // $("#DelChannel").val($channelId);
+    //     // $("#ShowChannel").val($channelId);
+    //     // alert("Feed number: " + this.rowIndex);
+    // });
+
     // $($("#rssList tr")[1]).click();
     showChannel($trRssList, currentChannelRow);
+    showFeed($trRssFeed, 2);
 
 //    $($("#rssFeed tr")[2]).click();
 

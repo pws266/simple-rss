@@ -1,7 +1,7 @@
 package main.java.com.dataart.rss.web;
 
 import main.java.com.dataart.rss.data.FeedChannel;
-import main.java.com.dataart.rss.data.FeedItem;
+import main.java.com.dataart.rss.data.UserFeedItem;
 import main.java.com.dataart.rss.data.User;
 import main.java.com.dataart.rss.db.ChannelDAO;
 import main.java.com.dataart.rss.db.FeedItemDAO;
@@ -41,7 +41,7 @@ class Helper {
         request.setAttribute("listFeed", feeds);
 */
         // getting current RSS-channel feeds
-        List<FeedItem> feeds = feedDAO.getChannelFeedsForUser(userId, channelId, pageNumber, isDesc);
+        List<UserFeedItem> feeds = feedDAO.getChannelFeedsForUser(userId, channelId, pageNumber, isDesc);
         request.setAttribute("listFeed", feeds);
 
         int feedsNumber = feedDAO.getFeedsNumberForUser(userId, channelId);

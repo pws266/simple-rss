@@ -14,6 +14,7 @@ import java.net.URL;
 import main.java.com.dataart.rss.data.FeedChannel;
 import main.java.com.dataart.rss.data.FeedItem;
 
+import static javax.xml.stream.XMLInputFactory.IS_COALESCING;
 import static main.java.com.dataart.rss.data.Reference.*;
 /**
  * RSS 2.0 feeds parser. Reads items in RSS XML file sequentially
@@ -35,6 +36,8 @@ public class FeedParser {
     // returns event reader for further RSS XML parsing
     private static XMLEventReader getEventReader(URL url) throws XMLStreamException, IOException {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+        // necessary for correct XML special symbols(e.g. &lt; &gt; &nbsp;, etc) reading
+        inputFactory.setProperty(IS_COALESCING, true);
 
         InputStream in = url.openStream();
         return inputFactory.createXMLEventReader(in);

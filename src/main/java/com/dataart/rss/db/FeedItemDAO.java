@@ -1,6 +1,7 @@
 package main.java.com.dataart.rss.db;
 
 import main.java.com.dataart.rss.data.FeedItem;
+import main.java.com.dataart.rss.data.UserFeedItem;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static main.java.com.dataart.rss.data.Reference.ALL_CHANNELS_ID;
 import static main.java.com.dataart.rss.data.Reference.FEEDS_PER_PAGE;
 
 /**
@@ -72,7 +74,8 @@ public class FeedItemDAO {
         statement.setString(1, item.getGuid());
         statement.setString(2, item.getTitle());
         statement.setString(3, item.getLink());
-        statement.setString(4, item.getDescription());
+        // statement.setString(4, item.getDescription());
+        statement.setString(4, item.parseDescription());
         statement.setTimestamp(5, item.getTimestamp());
         statement.setInt(6, channelId);
 
@@ -149,10 +152,10 @@ public class FeedItemDAO {
     }
 
     // "getChannelFeeds" returns list of RSS-feeds of user and RSS-channel with specified IDs
-    public List<FeedItem> getChannelFeedsForUser(int userId, int channelId, int pageNumber, boolean isDesc) throws SQLException {
-        List<FeedItem> feeds = new ArrayList<>();
+    public List<UserFeedItem> getChannelFeedsForUser(int userId, int channelId, int pageNumber, boolean isDesc) throws SQLException {
+        List<UserFeedItem> feeds = new ArrayList<>();
 
-        String sqlQueryPattern = "SELECT * FROM item it INNER JOIN user_item uit ON it.guid = uit.fk_item_guid " +
+        String sqlQueryPattern = "SELECT it.*, uit.isRead FROM item it INNER JOIN user_item uit ON it.guid = uit.fk_item_guid " +
                                  "INNER JOIN user_channel uch ON uit.fk_user_channel_id = uch.id " +
                                  "WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ? ORDER BY it.pubDate ";
         sqlQueryPattern += isDesc ? "DESC " : "ASC ";
@@ -171,7 +174,7 @@ public class FeedItemDAO {
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
-            FeedItem currentItem = new FeedItem();
+            UserFeedItem currentItem = new UserFeedItem();
 
             // TODO: custom structure for search results
             currentItem.setGuid(resultSet.getString("guid"));
@@ -180,9 +183,10 @@ public class FeedItemDAO {
 
 
             // TODO: make correct "text" field reading via ajax
-            // currentItem.setDescription(resultSet.getBlob("description"));
+            currentItem.setDescription(resultSet.getString("description"));
 
             currentItem.setPubDate(resultSet.getTimestamp("pubDate"));
+            currentItem.setReadFlag(resultSet.getBoolean("isRead"));
 
             feeds.add(currentItem);
         }
@@ -193,5 +197,66 @@ public class FeedItemDAO {
         db.disconnect();
 
         return feeds;
+    }
+
+    // changes feed from "unread" to "read" and vice versa. Returns updated state of USER_ITEM feed flag "isRead"
+    public boolean invertFeedState(int userId, int channelId, String feedGuid, boolean feedState) throws SQLException {
+        String sqlQuery = "SELECT uch.id, uit.isRead FROM user_item uit INNER JOIN user_channel uch " +
+                          "ON uit.fk_user_channel_id = uch.id WHERE uch.fk_user_id = ? AND uit.fk_item_guid = ?";
+
+        if (channelId != ALL_CHANNELS_ID) {
+            sqlQuery += " AND uch.fk_channel_id = ?";
+        }
+
+        db.connect();
+
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setInt(1, userId);
+        statement.setString(2, feedGuid);
+
+        if (channelId != ALL_CHANNELS_ID) {
+            statement.setInt(3, channelId);
+        }
+
+        ResultSet resultSet = statement.executeQuery();
+
+        int userAndChannelId;
+        boolean isFeedRead;
+
+        if (resultSet.next()) {
+            userAndChannelId = resultSet.getInt("id");
+            isFeedRead = resultSet.getBoolean("isRead");
+        }
+        else {
+            resultSet.close();
+            statement.close();
+
+            db.disconnect();
+
+            throw new SQLException("FeedItemDAO->invertFeedState: Feed is not found");
+        }
+
+        resultSet.close();
+        statement.close();
+
+        // updating feed state
+        isFeedRead = !isFeedRead;
+
+        sqlQuery = "UPDATE user_item SET isRead = ? WHERE fk_user_channel_id = ? AND fk_item_guid = ?";
+
+        statement = db.getConnection().prepareStatement(sqlQuery);
+
+        // statement.setBoolean(1, isFeedRead);
+        statement.setBoolean(1, feedState);
+        statement.setInt(2, userAndChannelId);
+        statement.setString(3, feedGuid);
+
+        statement.executeUpdate();
+
+        statement.close();
+        db.disconnect();
+
+        return isFeedRead;
     }
 }
