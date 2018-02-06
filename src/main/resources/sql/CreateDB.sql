@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS USER_CHANNEL (id int not null auto_increment primary 
 
 -- User items table
 CREATE TABLE IF NOT EXISTS USER_ITEM (isRead boolean not null default false,
+                        isDelete boolean not null default false,
 --                        fk_user_id int,
                         fk_user_channel_id int,
                         fk_item_guid varchar(255),

@@ -18,7 +18,9 @@
         var feedsNumber = <%=request.getAttribute("feedsNumber")%>,
             feedsPerPage = <%=request.getAttribute("feedsPerPage")%>,
             currentPage = <%=request.getAttribute("currentPageNumber")%>,
-            currentChannelRow=<%=request.getAttribute("currentChannelRow")%>;
+            currentChannelRow=<%=request.getAttribute("currentChannelRow")%>,
+            currentFeedRow=<%=request.getAttribute("currentFeedRow")%>,
+            contextPath = "${pageContext.request.contextPath}";
     </script>
 
     <script type="text/javascript" src="resources/js/select-channel.js"></script>
@@ -77,6 +79,21 @@
                 <input type="hidden" id="DelChannel" name="deletedChannelId" value="">
                 <input type="hidden" id="SortRBForDelete" name="sortRBForDelete" value='${requestScope["sortRBForDelete"]}'>
             </form>
+            <form action="update-channel" method="POST" id="updateChannelForm">
+                <input type="hidden" id="UpdatedChannelId" name="updatedChannelId" value="">
+                <input type="hidden" id="UpdatedChannelRow" name="updatedChannelRow" value="">
+                <input type="hidden" id="SortRBForUpdate" name="sortRBForUpdate" value='${requestScope["sortRBForUpdate"]}'>
+                <input type="hidden" id="UpdatedCurrentPage" name="updatedCurrentPage" value='${requestScope["updatedCurrentPage"]}'>
+                <input type="hidden" id="UpdatedFeedRow" name="updatedFeedRow" value="">
+            </form>
+            <form action="remove-item" method="POST" id="removeFeedForm">
+                <input type="hidden" id="RemoveItemChannelId" name="removeItemChannelId" value="">
+                <input type="hidden" id="RemoveItemChannelRow" name="removeItemChannelRow" value="">
+                <input type="hidden" id="SortRBForRemoveItem" name="sortRBForRemoveItem" value='${requestScope["sortRBForRemoveItem"]}'>
+                <input type="hidden" id="RemoveItemCurrentPage" name="removeItemCurrentPage" value='${requestScope["removeItemCurrentPage"]}'>
+                <input type="hidden" id="RemoveItemRow" name="removeItemRow" value="">
+                <input type="hidden" id="RemoveItemGuid" name="removeFeedGuid" value="">
+            </form>
 
             <table id="rssOperation" align="center">
                 <tr>
@@ -98,7 +115,7 @@
                     <td class="oper-left-td">Action:</td>
                     <td class="oper-right-td">
                         <input type="submit" style="width: 60px; padding: 0" value="Add" form="addChannelForm" />
-                        <input type="submit" style="width: 60px; padding: 0" value="Update" form="showFeedsForm" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Update" form="updateChannelForm" />
                         <input type="submit" style="width: 60px; padding: 0" value="Remove" form="deleteChannelForm" />
                     </td>
                 </tr>
@@ -141,7 +158,7 @@
                         <!-- Создавать свои формы под реакции -->
                         <input type="button" style="width: 60px; padding: 0" value="As Read" form="showFeedsForm" onclick="markFeedRead(event)" />
                         <input type="button" style="width: 70px; padding: 0" value="As Unread" form="showFeedsForm" onclick="markFeedUnread(event)" />
-                        <input type="submit" style="width: 60px; padding: 0" value="Delete" form="showFeedsForm" />
+                        <input type="submit" style="width: 60px; padding: 0" value="Delete" form="removeFeedForm" />
                     </td>
                 </tr>
             </table>

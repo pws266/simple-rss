@@ -2,6 +2,7 @@ package main.java.com.dataart.rss.db;
 
 import main.java.com.dataart.rss.data.FeedItem;
 import main.java.com.dataart.rss.data.UserFeedItem;
+import main.java.com.dataart.rss.data.UserItem;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,6 +63,53 @@ public class FeedItemDAO {
         return rssItem;
     }
 
+    // searches for RSS-item inside USER_ITEM table of specified user
+    public UserItem findUserItem(String guid, int userChannelId) throws SQLException {
+        UserItem userItem = null;
+
+        String sqlQuery = "SELECT * FROM user_item WHERE fk_item_guid = ? AND fk_user_channel_id = ?";
+
+        db.connect();
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setString(1, guid);
+        statement.setInt(2, userChannelId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            userItem = new UserItem(resultSet.getString("fk_item_guid"), resultSet.getInt("fk_user_channel_id"),
+                                    resultSet.getBoolean("isRead"), resultSet.getBoolean("isDelete"));}
+
+        resultSet.close();
+        statement.close();
+
+        db.disconnect();
+
+        return userItem;
+    }
+
+    // updates fields of RSS-item in ITEM table
+    public boolean updateItem(FeedItem item) throws SQLException, ParseException {
+        String sqlQuery = "UPDATE item SET title = ?, link = ?, description = ?, pubDate = ? WHERE guid = ?";
+
+        db.connect();
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setString(1, item.getTitle());
+        statement.setString(2, item.getLink());
+        statement.setString(3, item.getDescription());
+        statement.setTimestamp(4, item.getTimestamp());
+        statement.setString(5, item.getGuid());
+
+        boolean isOk = statement.executeUpdate() > 0;
+
+        statement.close();
+        db.disconnect();
+
+        return isOk;
+    }
+
     // adds unknown RSS-item of specified RSS-channel to ITEM table
     public boolean addItem(FeedItem item, int channelId) throws SQLException, ParseException {
         String sqlQuery = "INSERT INTO item (guid, title, link, description, pubDate, fk_channel_id) " +
@@ -74,8 +122,8 @@ public class FeedItemDAO {
         statement.setString(1, item.getGuid());
         statement.setString(2, item.getTitle());
         statement.setString(3, item.getLink());
-        // statement.setString(4, item.getDescription());
-        statement.setString(4, item.parseDescription());
+        statement.setString(4, item.getDescription());
+        // statement.setString(4, item.parseDescription());
         statement.setTimestamp(5, item.getTimestamp());
         statement.setInt(6, channelId);
 
@@ -126,15 +174,25 @@ public class FeedItemDAO {
 
     // "getFeedsNumberForUser" returns number of RSS-feeds for specified user and channel
     public int getFeedsNumberForUser(int userId, int channelId) throws SQLException {
+//        String sqlQuery = "SELECT COUNT(*) FROM user_item uit INNER JOIN user_channel uch " +
+//                          "ON uit.fk_user_channel_id = uch.id WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ?";
         String sqlQuery = "SELECT COUNT(*) FROM user_item uit INNER JOIN user_channel uch " +
-                          "ON uit.fk_user_channel_id = uch.id WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ?";
+                          "ON uit.fk_user_channel_id = uch.id WHERE uit.isDelete = false AND uch.fk_user_id = ?";
+
+        if (channelId != ALL_CHANNELS_ID) {
+            sqlQuery += " AND uch.fk_channel_id = ?";
+        }
+
 
         db.connect();
 
         PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
 
         statement.setInt(1, userId);
-        statement.setInt(2, channelId);
+//        statement.setInt(2, channelId);
+        if (channelId != ALL_CHANNELS_ID) {
+            statement.setInt(2, channelId);
+        }
 
         int feedsNumber = 0;
         ResultSet resultSet = statement.executeQuery();
@@ -155,9 +213,19 @@ public class FeedItemDAO {
     public List<UserFeedItem> getChannelFeedsForUser(int userId, int channelId, int pageNumber, boolean isDesc) throws SQLException {
         List<UserFeedItem> feeds = new ArrayList<>();
 
-        String sqlQueryPattern = "SELECT it.*, uit.isRead FROM item it INNER JOIN user_item uit ON it.guid = uit.fk_item_guid " +
-                                 "INNER JOIN user_channel uch ON uit.fk_user_channel_id = uch.id " +
-                                 "WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ? ORDER BY it.pubDate ";
+//        String sqlQueryPattern = "SELECT it.*, uit.isRead FROM item it INNER JOIN user_item uit ON it.guid = uit.fk_item_guid " +
+//                                 "INNER JOIN user_channel uch ON uit.fk_user_channel_id = uch.id " +
+//                                 "WHERE uch.fk_user_id = ? AND uch.fk_channel_id = ? ORDER BY it.pubDate ";
+        String sqlQueryPattern = "SELECT it.*, uit.isRead, uit.isDelete FROM item it INNER JOIN user_item uit " +
+                "ON it.guid = uit.fk_item_guid INNER JOIN user_channel uch ON uit.fk_user_channel_id = uch.id " +
+                "WHERE uit.isDelete = false AND uch.fk_user_id = ? "; //"AND uch.fk_channel_id = ? ORDER BY it.pubDate ";
+
+        if (channelId != ALL_CHANNELS_ID) {
+            sqlQueryPattern += "AND uch.fk_channel_id = ? ";
+        }
+
+        sqlQueryPattern += "ORDER BY it.pubDate ";
+
         sqlQueryPattern += isDesc ? "DESC " : "ASC ";
         sqlQueryPattern += "LIMIT %d, %d";
 
@@ -169,7 +237,10 @@ public class FeedItemDAO {
 
         PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
         statement.setInt(1, userId);
-        statement.setInt(2, channelId);
+//        statement.setInt(2, channelId);
+        if (channelId != ALL_CHANNELS_ID) {
+            statement.setInt(2, channelId);
+        }
 
         ResultSet resultSet = statement.executeQuery();
 
@@ -187,8 +258,11 @@ public class FeedItemDAO {
 
             currentItem.setPubDate(resultSet.getTimestamp("pubDate"));
             currentItem.setReadFlag(resultSet.getBoolean("isRead"));
+            currentItem.setDeleteFlag(resultSet.getBoolean("isDelete"));
 
-            feeds.add(currentItem);
+            if (!currentItem.isDeleteFlag()) {
+                feeds.add(currentItem);
+            }
         }
 
         resultSet.close();
@@ -258,5 +332,51 @@ public class FeedItemDAO {
         db.disconnect();
 
         return isFeedRead;
+    }
+
+    // marks RSS - item with specified GUID as deleted in USER_ITEM table
+    public void deleteUserItem(int userId, String guid) throws SQLException{
+        // getting user's channel ID
+        String sqlQuery = "SELECT uch.id FROM user_channel uch INNER JOIN item it ON it.fk_channel_id = uch.fk_channel_id WHERE uch.fk_user_id = ? AND it.guid = ?";
+
+        db.connect();
+
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setInt(1, userId);
+        statement.setString(2, guid);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        int userAndChannelId;
+
+        if (resultSet.next()) {
+            userAndChannelId = resultSet.getInt("id");
+        }
+        else {
+            resultSet.close();
+            statement.close();
+
+            db.disconnect();
+
+            throw new SQLException("FeedItemDAO->deleteUserItem: User's channel is not found");
+        }
+
+        resultSet.close();
+        statement.close();
+
+        // marking user item as "deleted"
+        sqlQuery = "UPDATE user_item SET isDelete = true WHERE fk_user_channel_id = ? AND fk_item_guid = ?";
+
+        statement = db.getConnection().prepareStatement(sqlQuery);
+
+        // statement.setBoolean(1, isFeedRead);
+        statement.setInt(1, userAndChannelId);
+        statement.setString(2, guid);
+
+        statement.executeUpdate();
+
+        statement.close();
+        db.disconnect();
     }
 }

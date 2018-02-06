@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import static main.java.com.dataart.rss.data.Reference.ALL_CHANNELS_ID;
+
 /**
  * Created by newbie on 22.12.17.
  */
@@ -33,12 +35,14 @@ public class RemoveChannelServlet extends HttpServlet {
 
         Helper.setSortingToSession("sortRBForDelete", request);
 
-        try {
-            User currentUser = Helper.getUser(userDAO, request);
+        if (channelId != ALL_CHANNELS_ID) {
+            try {
+                User currentUser = Helper.getUser(userDAO, request);
 
-            channelDAO.deleteChannel(channelId, currentUser.getId());
-        } catch (SQLException exc) {
-            throw new ServletException(exc);
+                channelDAO.deleteChannel(channelId, currentUser.getId());
+            } catch (SQLException exc) {
+                throw new ServletException(exc);
+            }
         }
 
         response.sendRedirect("show");

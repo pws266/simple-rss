@@ -122,13 +122,13 @@ public class AddChannelServlet extends HttpServlet {
 
                     if (isRead) {
                         // if no GUID in RSS-item
-                        if (rssParser.getCurrentItem().getGuid().isEmpty()) {
-                            String subGuid = rssParser.getCurrentItem().getLink().isEmpty() ?
-                                                 rssParser.getCurrentItem().getTitle() : rssParser.getCurrentItem().getLink();
-                            if (!subGuid.isEmpty()) {
-                                rssParser.getCurrentItem().setGuid(subGuid);
-                            }
-                        }
+//                        if (rssParser.getCurrentItem().getGuid().isEmpty()) {
+//                            String subGuid = rssParser.getCurrentItem().getLink().isEmpty() ?
+//                                                 rssParser.getCurrentItem().getTitle() : rssParser.getCurrentItem().getLink();
+//                            if (!subGuid.isEmpty()) {
+//                                rssParser.getCurrentItem().setGuid(subGuid);
+//                            }
+//                        }
 
                         itemDAO.addItem(rssParser.getCurrentItem(), channelId);
                         itemDAO.assignItemToUser(rssParser.getCurrentItem().getGuid(), userChannelId);

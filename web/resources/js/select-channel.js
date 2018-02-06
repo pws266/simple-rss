@@ -11,7 +11,8 @@ function markFeed(event, state, rowIndex, channelId) {
         $feedGuid=$(myRow).find('td:nth-child(5)').html();
 
     $.ajax({
-        url: "../mark-feed",
+        //url: "../mark-feed",
+        url: contextPath + "/mark-feed",
         type: "POST",
         dataType: "json",
         cache: false,
@@ -55,6 +56,8 @@ $(window).load(function(){
 
         $("#SortRBForAdd").val($sortingState);
         $("#SortRBForDelete").val($sortingState);
+        $("#SortRBForUpdate").val($sortingState);
+        $("#SortRBForRemoveItem").val($sortingState);
 
         $("#showFeedsForm").submit();
 /*
@@ -122,8 +125,12 @@ $(window).load(function(){
         $(elm).parent("table").find("tr.selected").find("td:first").html();
         $("#DelChannel").val($channelId);
         $("#ShowChannel").val($channelId);
+        $("#UpdatedChannelId").val($channelId);
+        $("#RemoveItemChannelId").val($channelId);
 
         $("#ChannelRow").val(rowIndex);
+        $("#UpdatedChannelRow").val(rowIndex);
+        $("#RemoveItemChannelRow").val(rowIndex);
     }
 
     $trRssList.click(function(){
@@ -133,6 +140,7 @@ $(window).load(function(){
         }
 
         $('#PageForShow').val(1);
+        $('#UpdatedCurrentPage').val(1);
 
         //$("input[name='sorting']").val("asc");
         showChannel(this, rowIndex);
@@ -157,6 +165,9 @@ $(window).load(function(){
         $($("#feed-description-row").find("td")[0]).html("").append('<b>Description:</b> ').append($descContent);
 
         $("#FeedRow").val(rowIndex);
+        $("#RemoveItemRow").val(rowIndex);
+
+        $("#RemoveItemGuid").val($feedGuid);
 
         // $.ajax({
         //     url: "../mark-feed",
@@ -238,7 +249,12 @@ $(window).load(function(){
 
     // $($("#rssList tr")[1]).click();
     showChannel($trRssList, currentChannelRow);
-    showFeed($trRssFeed, 2);
+
+    if (currentFeedRow === null) {
+        currentFeedRow = 2;
+    }
+    showFeed($trRssFeed, currentFeedRow);
+    //showFeed($trRssFeed, 2);
 
 //    $($("#rssFeed tr")[2]).click();
 
@@ -252,6 +268,7 @@ $(window).load(function(){
 
         onPageClick: function(pageNumber) {
             $("#PageForShow").val(pageNumber);
+            $("#UpdatedCurrentPage").val(pageNumber);
             $("#showFeedsForm").submit();
         }
     });

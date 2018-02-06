@@ -101,6 +101,18 @@ public class FeedParser {
                 }
             } else if (event.isEndElement()) {
                 if (TAG_ITEM.equals(event.asEndElement().getName().getLocalPart())) {
+                    // if GUID isn't specified, swapping it to the current feed title or link
+                    if (currentItem.getGuid().isEmpty()) {
+                        String subGuid = currentItem.getLink().isEmpty() ? currentItem.getTitle() : currentItem.getLink();
+                        if (!subGuid.isEmpty()) {
+                            currentItem.setGuid(subGuid);
+                        }
+                    }
+
+                    // processing feed description (deleting spaces, tabs, images, html-comments, etc)
+                    String parsedDescription = currentItem.parseDescription();
+                    currentItem.setDescription(parsedDescription);
+
                     ++readItemsNumber;
                     return true;
                 }

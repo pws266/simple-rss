@@ -1,6 +1,7 @@
 package main.java.com.dataart.rss.db;
 
 import main.java.com.dataart.rss.data.FeedChannel;
+import main.java.com.dataart.rss.data.Reference;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,6 +32,31 @@ public class ChannelDAO {
         }
 
         return channelInstance;
+    }
+
+    // searches RSS-channel in CHANNEL table by spacified ID
+    public FeedChannel findChannel(int channelId) throws SQLException {
+        FeedChannel rssChannel = null;
+
+        String sqlQuery = "SELECT * FROM channel WHERE id = ?";
+
+        db.connect();
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setInt(1, channelId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        if (resultSet.next()) {
+            rssChannel = new FeedChannel(resultSet.getInt("id"), resultSet.getString("rssLink"),
+                    resultSet.getString("title"), resultSet.getString("link"),
+                    resultSet.getString("description"));}
+
+        resultSet.close();
+        statement.close();
+        db.disconnect();
+
+        return rssChannel;
     }
 
     // searches for specified RSS-channel in CHANNEL table of database
@@ -249,5 +275,30 @@ public class ChannelDAO {
         db.disconnect();
 
         return userChannels;
+    }
+
+    // returns ID of given RSS-channel assigned to specified user (ID from USER_CHANNEL table)
+    public int findUserChannel(int userId, int channelId) throws SQLException {
+        String sqlQuery = "SELECT id FROM user_channel WHERE fk_user_id = ? AND fk_channel_id = ?";
+
+        db.connect();
+        PreparedStatement statement = db.getConnection().prepareStatement(sqlQuery);
+
+        statement.setInt(1, userId);
+        statement.setInt(2, channelId);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        int userChannelId = UNASSIGNED_ID;
+
+        if (resultSet.next()) {
+            userChannelId = resultSet.getInt("id");
+        }
+
+        resultSet.close();
+        statement.close();
+        db.disconnect();
+
+        return userChannelId;
     }
  }

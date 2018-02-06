@@ -14,6 +14,7 @@ import java.util.List;
 
 import static main.java.com.dataart.rss.data.Reference.DEFAULT_SORT_STATE;
 import static main.java.com.dataart.rss.data.Reference.FEEDS_PER_PAGE;
+import static main.java.com.dataart.rss.data.Reference.ALL_CHANNELS_ID;
 
 /**
  * Created by newbie on 22.12.17.
@@ -29,6 +30,13 @@ class Helper {
     // returns ID of the first channel in list
     static int setChannelsToJsp(int userId, ChannelDAO channelDAO, HttpServletRequest request) throws SQLException {
         List<FeedChannel> userChannels = channelDAO.getUserChannels(userId);
+
+        // adding "All channels" view if user has even though one channel
+        if (!userChannels.isEmpty()) {
+            FeedChannel allCh = new FeedChannel(ALL_CHANNELS_ID, "", "All channels", "", "All users's channel feeds");
+            userChannels.add(allCh);
+        }
+
         request.setAttribute("listChannel", userChannels);
 
         return userChannels.isEmpty() ? 0 : userChannels.get(0).getId();
@@ -50,15 +58,21 @@ class Helper {
         request.setAttribute("feedsPerPage", FEEDS_PER_PAGE);
         //request.setAttribute("currentPageNumber", pageNumber);
 
+        // assigning feed page number for displaying in channel.jsp
         request.setAttribute("pageNumber", pageNumber);
+        request.setAttribute("updatedCurrentPage", pageNumber);
+        request.setAttribute("removeItemCurrentPage", pageNumber);
 
         request.setAttribute("currentChannelRow", channelRow);
 
         String sortingState = isDesc ? "desc" : "asc";
 
+        // assigning sorting radio button state for displaying in channel.jsp
         request.setAttribute("sorting", sortingState);
         request.setAttribute("sortRBForAdd", sortingState);
         request.setAttribute("sortRBForDelete", sortingState);
+        request.setAttribute("sortRBForUpdate", sortingState);
+        request.setAttribute("sortRBForRemoveItem", sortingState);
     }
 
     // saves "sorting" radiogroup state in session variable
